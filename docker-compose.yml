@@ -7,6 +7,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: "postgres"
       POSTGRES_DB: postgres
+    command: ["postgres", "-c", "log_statement=all"]
     volumes:
       - db-data:/var/lib/postgresql/data
       - ./postgres/:/docker-entrypoint-initdb.d/
@@ -19,6 +20,12 @@ services:
     container_name: tickets-service
     ports:
       - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/tickets?currentSchema=public
+      - SPRING_DATASOURCE_USERNAME=program
+      - SPRING_DATASOURCE_PASSWORD=test
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
+      - MICROSERVICES_CINEMA-MICROSERVICE-URL=cinema-service:8060
     depends_on:
       - postgres
 
@@ -28,6 +35,11 @@ services:
     container_name: films-service
     ports:
       - "8070:8070"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/films?currentSchema=public
+      - SPRING_DATASOURCE_USERNAME=program
+      - SPRING_DATASOURCE_PASSWORD=test
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
     depends_on:
       - postgres
 
@@ -37,8 +49,15 @@ services:
     container_name: cinema-service
     ports:
       - "8060:8060"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/cinema?currentSchema=public
+      - SPRING_DATASOURCE_USERNAME=program
+      - SPRING_DATASOURCE_PASSWORD=test
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
+      - MICROSERVICES_FILM-MICROSERVICE-URL=films-service:8070
     depends_on:
       - postgres
+      - films-service
 
 volumes:
   db-data:
