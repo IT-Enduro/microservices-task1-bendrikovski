@@ -16,7 +16,7 @@ public record TicketService(TicketRepository ticketRepository, CinemaClient cine
         UUID sessionUid = cinemaClient.incrementTicketInSession(cinemaUid, filmUid, request.getDate());
 
         if (sessionUid == null) {
-            throw new RuntimeException("No tickets");
+            throw new RuntimeException("Sorry, no tickets");
         }
 
         TicketEntity ticket = TicketEntity.builder()
